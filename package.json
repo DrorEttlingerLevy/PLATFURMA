@@ -1,0 +1,8 @@
+{
+  "name": "platfurma",
+  "private": true,
+  "description": "Monorepo root marker; Vercel reads this for the Next version check. App lives in frontend/.",
+  "dependencies": {
+    "next": "16.2.4"
+  }
+}
