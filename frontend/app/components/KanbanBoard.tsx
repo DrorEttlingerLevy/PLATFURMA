@@ -9,7 +9,7 @@ import AddMomModal from "./AddMomModal";
 import AddActivityModal from "./AddActivityModal";
 import CalendarView from "./CalendarView";
 
-const STORAGE_KEY = "platfurma_board_v3";
+const STORAGE_KEY = "platfurma_board_v4";
 
 type View = "kanban" | "calendar";
 
@@ -32,7 +32,11 @@ export default function KanbanBoard() {
   const [showAddMom, setShowAddMom] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
 
-  useEffect(() => { setBoard(loadState()); }, []);
+  useEffect(() => {
+    // Hydration: server uses seed; client loads localStorage (platfurma_board_v4).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional post-mount read
+    setBoard(loadState());
+  }, []);
   useEffect(() => { saveState(board); }, [board]);
 
   const momById = new Map(board.moms.map((m) => [m.id, m]));
@@ -41,12 +45,10 @@ export default function KanbanBoard() {
     const { source, destination, draggableId } = result;
     if (!destination) return;
 
-    // draggableId is "momId::activityId" — extract just the momId
     const momId = draggableId.split("::")[0];
     const srcId = source.droppableId;
     const dstId = destination.droppableId;
 
-    // Within same column: reorder
     if (srcId === dstId) {
       if (source.index === destination.index) return;
       setBoard((prev) => {
@@ -59,11 +61,10 @@ export default function KanbanBoard() {
       return;
     }
 
-    // Cross-column: move (abort if already enrolled in destination)
     setBoard((prev) => {
       const next = structuredClone(prev);
       const destList = next.enrollments[dstId] ?? [];
-      if (destList.includes(momId)) return prev; // already there — no-op
+      if (destList.includes(momId)) return prev;
 
       next.enrollments[srcId] = next.enrollments[srcId].filter((id) => id !== momId);
       if (!next.enrollments[dstId]) next.enrollments[dstId] = [];
@@ -114,57 +115,70 @@ export default function KanbanBoard() {
     });
   }
 
-  // Moms not enrolled in any activity
   const enrolledAny = new Set(Object.values(board.enrollments).flat());
   const unenrolledCount = board.moms.filter((m) => !enrolledAny.has(m.id)).length;
 
   return (
     <>
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-border-subtle bg-surface sticky top-0 z-10 shadow-sm motion-reduce:transition-none">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">PLATFURMA</h1>
-          <p className="text-xs text-gray-400">Post-birth activity manager</p>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-stone-100">PLATFURMA</h1>
+          <p className="text-xs text-stone-500">ניהול פעילויות לאחר לידה</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* View toggle */}
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex rounded-lg border border-border-subtle overflow-hidden text-sm font-medium bg-surface-muted">
             <button
+              type="button"
               onClick={() => setView("kanban")}
-              className={`px-3 py-1.5 transition-colors ${view === "kanban" ? "bg-purple-600 text-white" : "text-gray-500 hover:bg-gray-50"}`}
+              className={`px-3 py-1.5 transition-colors motion-reduce:transition-none focus-app ${view === "kanban" ? "bg-accent text-white" : "text-stone-600 hover:bg-surface"}`}
             >
-              Kanban
+              לוח עבודה
             </button>
             <button
+              type="button"
               onClick={() => setView("calendar")}
-              className={`px-3 py-1.5 transition-colors ${view === "calendar" ? "bg-purple-600 text-white" : "text-gray-500 hover:bg-gray-50"}`}
+              className={`px-3 py-1.5 transition-colors motion-reduce:transition-none focus-app ${view === "calendar" ? "bg-accent text-white" : "text-stone-600 hover:bg-surface"}`}
             >
-              Calendar
+              לוח שנה
             </button>
           </div>
 
-          <button onClick={() => setShowAddMom(true)} className="bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-            + Mom
+          <button
+            type="button"
+            onClick={() => setShowAddMom(true)}
+            className="bg-accent text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-hover transition-colors motion-reduce:transition-none focus-app"
+          >
+            + אם חדשה
           </button>
-          <button onClick={() => setShowAddActivity(true)} className="bg-white border border-purple-600 text-purple-600 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors">
-            + Activity
+          <button
+            type="button"
+            onClick={() => setShowAddActivity(true)}
+            className="bg-surface border border-accent text-accent text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-muted/40 transition-colors motion-reduce:transition-none focus-app"
+          >
+            + פעילות
           </button>
           {unenrolledCount > 0 && (
-            <span className="text-xs text-amber-600 font-medium">{unenrolledCount} not enrolled</span>
+            <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+              {unenrolledCount} ללא שיבוץ
+            </span>
           )}
-          <button onClick={() => { setBoard(buildInitialBoardState()); }} className="text-xs text-gray-400 hover:text-gray-600" title="Reset to seed data">
-            Reset
+          <button
+            type="button"
+            onClick={() => { setBoard(buildInitialBoardState()); }}
+            className="text-xs text-stone-400 hover:text-stone-600 focus-app rounded px-1"
+            title="איפוס לנתוני הדגמה"
+          >
+            איפוס
           </button>
         </div>
       </div>
 
-      {/* Views */}
       {view === "calendar" ? (
         <CalendarView board={board} />
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex gap-4 p-6 overflow-x-auto min-h-[calc(100vh-65px)] items-start">
+          <div className="flex gap-4 p-6 overflow-x-auto min-h-[calc(100vh-65px)] items-start motion-reduce:transition-none">
             {board.activities.map((activity) => {
               const actMoms = (board.enrollments[activity.id] ?? [])
                 .map((id) => momById.get(id))
@@ -183,8 +197,8 @@ export default function KanbanBoard() {
             })}
 
             {board.activities.length === 0 && (
-              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm py-24">
-                No activities yet — click <span className="mx-1 font-semibold text-purple-600">+ Activity</span> to add one.
+              <div className="flex-1 flex items-center justify-center text-stone-500 text-sm py-24 px-4 text-center">
+                אין פעילויות עדיין — לחצו <span className="mx-1 font-semibold text-accent">+ פעילות</span> כדי להוסיף.
               </div>
             )}
           </div>

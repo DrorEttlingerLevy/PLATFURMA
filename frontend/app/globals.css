@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f5;
+  --foreground: #1c1917;
+  --surface: #ffffff;
+  --surface-muted: #f5f0ea;
+  --accent: #b4532a;
+  --accent-hover: #943e1f;
+  --accent-muted: #e8d5cc;
+  --border-subtle: #e7e2dc;
+  --ring-focus: #b4532a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-border-subtle: var(--border-subtle);
+  --font-sans: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #121110;
+    --foreground: #f5f2ed;
+    --surface: #1c1917;
+    --surface-muted: #292524;
+    --accent: #e8a090;
+    --accent-hover: #f0b8a8;
+    --accent-muted: #5c3d32;
+    --border-subtle: #44403c;
+    --ring-focus: #e8a090;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+.focus-app:focus-visible {
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
 }
