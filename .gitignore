@@ -16,8 +16,8 @@ wheels/
 pip-log.txt
 pip-delete-this-directory.txt
 .installed.cfg
-lib/
-lib64/
+/lib/
+/lib64/
 
 # Virtual environments
 .venv/
@@ -103,3 +103,4 @@ yarn-error.log*
 .cache/
 tmp/
 temp/
+.vercel

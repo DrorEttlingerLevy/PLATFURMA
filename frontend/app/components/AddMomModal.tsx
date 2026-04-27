@@ -42,39 +42,45 @@ export default function AddMomModal({ onAdd, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mx-4">
-        <h2 className="text-lg font-bold mb-4 text-gray-800">Add New Mom</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 motion-reduce:transition-none" role="presentation" onClick={onClose}>
+      <div
+        className="bg-surface rounded-2xl shadow-xl p-6 w-full max-w-md mx-4 border border-border-subtle"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-mom-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 id="add-mom-title" className="text-lg font-bold mb-4 text-stone-800 dark:text-stone-100">הוספת אם</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <Field label="Mom's Name *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-          <Field label="Phone *" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
-          <Field label="Baby's Name *" value={form.babyName} onChange={(v) => setForm({ ...form, babyName: v })} />
+          <Field label="שם האם *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+          <Field label="טלפון *" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
+          <Field label="אימייל" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+          <Field label="שם התינוק/ת *" value={form.babyName} onChange={(v) => setForm({ ...form, babyName: v })} />
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Baby Age (months) * — use 0.5 for under 1 month</label>
+            <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">גיל התינוק/ת (בחודשים) * — 0.5 לגיל מתחת לחודש</label>
             <input
               type="number"
               value={form.babyAgeMonths}
               min={0}
               step={0.5}
               onChange={(e) => setForm({ ...form, babyAgeMonths: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             />
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="submit"
               disabled={!valid}
-              className="flex-1 bg-purple-600 text-white rounded-lg py-2 font-semibold disabled:opacity-40 hover:bg-purple-700 transition-colors"
+              className="flex-1 bg-accent text-white rounded-lg py-2 font-semibold disabled:opacity-40 hover:bg-accent-hover transition-colors motion-reduce:transition-none focus-app"
             >
-              Add Mom
+              שמירה
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-lg py-2 font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 border border-border-subtle rounded-lg py-2 font-semibold text-stone-600 dark:text-stone-300 hover:bg-surface-muted transition-colors motion-reduce:transition-none focus-app"
             >
-              Cancel
+              ביטול
             </button>
           </div>
         </form>
@@ -96,12 +102,12 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
       />
     </div>
   );

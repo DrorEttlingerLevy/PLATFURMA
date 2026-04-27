@@ -12,7 +12,6 @@ function generateId() {
   return "ACT-" + Date.now().toString(36).toUpperCase();
 }
 
-// Convert <input type="date"> value (YYYY-MM-DD) → DDMMYYYY
 function toDDMMYYYY(isoDate: string) {
   const [y, m, d] = isoDate.split("-");
   if (!y || !m || !d) return "";
@@ -29,7 +28,7 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
     isOneTime: false,
     sessionsPerWeek: "1",
     totalWeeks: "8",
-    startDate: "", // YYYY-MM-DD from input
+    startDate: "",
   });
 
   const valid =
@@ -56,33 +55,39 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-bold mb-4 text-gray-800">Add New Activity</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="presentation" onClick={onClose}>
+      <div
+        className="bg-surface rounded-2xl shadow-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto border border-border-subtle"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-act-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 id="add-act-title" className="text-lg font-bold mb-4 text-stone-800 dark:text-stone-100">הוספת פעילות</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
 
-          <Field label="Activity Name *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+          <Field label="שם הפעילות *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
 
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">תיאור</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Start Date *</label>
+            <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">תאריך התחלה *</label>
             <input
               type="date"
               value={form.startDate}
               onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             />
             {form.startDate && (
-              <p className="text-xs text-gray-400 mt-0.5">Will be stored as: {toDDMMYYYY(form.startDate)}</p>
+              <p className="text-xs text-stone-400 mt-0.5">נשמר כ־{toDDMMYYYY(form.startDate)} (פורמט DDMMYYYY)</p>
             )}
           </div>
 
@@ -92,20 +97,20 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
               type="checkbox"
               checked={form.isOneTime}
               onChange={(e) => setForm({ ...form, isOneTime: e.target.checked })}
-              className="w-4 h-4 accent-purple-600"
+              className="w-4 h-4 accent-[var(--accent)]"
             />
-            <label htmlFor="isOneTime" className="text-sm text-gray-600">One-time event (no recurring schedule)</label>
+            <label htmlFor="isOneTime" className="text-sm text-stone-600 dark:text-stone-300">אירוע חד-פעמי (ללא מחזוריות)</label>
           </div>
 
           {!form.isOneTime && (
             <div className="flex gap-3">
               <NumField
-                label="Sessions/week *"
+                label="מפגשים בשבוע *"
                 value={form.sessionsPerWeek}
                 onChange={(v) => setForm({ ...form, sessionsPerWeek: v })}
               />
               <NumField
-                label="Total weeks *"
+                label="סה״כ שבועות *"
                 value={form.totalWeeks}
                 onChange={(v) => setForm({ ...form, totalWeeks: v })}
               />
@@ -118,15 +123,15 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
               type="checkbox"
               checked={form.hasAgeRange}
               onChange={(e) => setForm({ ...form, hasAgeRange: e.target.checked })}
-              className="w-4 h-4 accent-purple-600"
+              className="w-4 h-4 accent-[var(--accent)]"
             />
-            <label htmlFor="hasAge" className="text-sm text-gray-600">Has baby age range</label>
+            <label htmlFor="hasAge" className="text-sm text-stone-600 dark:text-stone-300">טווח גילאים לתינוק/ת (בחודשים)</label>
           </div>
 
           {form.hasAgeRange && (
             <div className="flex gap-3">
-              <NumField label="Min age (months)" value={form.ageMin} onChange={(v) => setForm({ ...form, ageMin: v })} />
-              <NumField label="Max age (months)" value={form.ageMax} onChange={(v) => setForm({ ...form, ageMax: v })} />
+              <NumField label="גיל מינ׳ (חודשים)" value={form.ageMin} onChange={(v) => setForm({ ...form, ageMin: v })} />
+              <NumField label="גיל מקס׳ (חודשים)" value={form.ageMax} onChange={(v) => setForm({ ...form, ageMax: v })} />
             </div>
           )}
 
@@ -134,16 +139,16 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
             <button
               type="submit"
               disabled={!valid}
-              className="flex-1 bg-purple-600 text-white rounded-lg py-2 font-semibold disabled:opacity-40 hover:bg-purple-700 transition-colors"
+              className="flex-1 bg-accent text-white rounded-lg py-2 font-semibold disabled:opacity-40 hover:bg-accent-hover transition-colors motion-reduce:transition-none focus-app"
             >
-              Add Activity
+              הוספה
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-lg py-2 font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 border border-border-subtle rounded-lg py-2 font-semibold text-stone-600 dark:text-stone-300 hover:bg-surface-muted transition-colors motion-reduce:transition-none focus-app"
             >
-              Cancel
+              ביטול
             </button>
           </div>
         </form>
@@ -155,12 +160,12 @@ export default function AddActivityModal({ onAdd, onClose }: Props) {
 function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
       />
     </div>
   );
@@ -169,13 +174,13 @@ function Field({ label, value, onChange, type = "text" }: { label: string; value
 function NumField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="flex-1">
-      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1">{label}</label>
       <input
         type="number"
         min={0}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
       />
     </div>
   );
